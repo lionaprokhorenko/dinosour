@@ -6,6 +6,7 @@ import sqlite3
 
 #загружаем картинки
 bg_image = pygame.image.load(os.path.join('files', 'bg.png'))
+start_image = pygame.image.load(os.path.join('files', 'start_image.png'))
 player_images = [pygame.image.load(os.path.join('files', 'DinoRun1.png')),
     pygame.image.load(os.path.join('files', 'DinoRun2.png')),
     pygame.image.load(os.path.join('files', 'DinoJump.png'))]
@@ -120,13 +121,13 @@ def bg(screen):
         screen.blit(bg_image, (bg_x - image_w , bg_y))
 
 
-def finish_game(screen, score, text):
+def finish_game(screen, score, name):
     run = True
     sound_finish.play()
-    print(text, score // 10)
+    print(name, score // 10)
 
     cur.execute("INSERT INTO users(text, score) VALUES(?, ?);",
-               (text, score // 10))  # записываем ифнормацию о текущей игре в базу данных
+               (name, score // 10))  # записываем ифнормацию о текущей игре в базу данных
     db.commit()
 
     cur.execute('SELECT * FROM users')
@@ -135,7 +136,7 @@ def finish_game(screen, score, text):
 
     screen.fill((255, 255, 255))
     font = pygame.font.SysFont('arial', 30)
-    text_score = font.render("Счёт за игру: " + str(score // 10), True, (0, 0, 0))
+    text_score = font.render("Счёт за игру: " + ' ' + str(score // 10), True, (0, 0, 0))
     score_rect = text_score.get_rect()
     score_rect.center = (width // 2, height // 2 - 100)
     screen.blit(text_score, score_rect)
@@ -166,7 +167,7 @@ def main():
     run = True
     start = True
     input_box = pygame.Rect(0, 0, 200, 30)
-    text = ''
+    name = ''
     while start:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -174,16 +175,17 @@ def main():
                 start = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    print(text)
+                    print(name)
                     start = False
                 elif event.key == pygame.K_BACKSPACE:
-                    text = text[:-1]
+                    name = name[:-1]
                 else:
-                    text += event.unicode
+                    name += event.unicode
 
         screen.fill((255, 255, 255))
+        screen.blit(start_image, (0, 0))
         font = pygame.font.SysFont('arial', 30)
-        txt = font.render(text, True, (0, 0, 0))
+        txt = font.render(name, True, (0, 0, 0))
         input_box.center = (width // 2, height // 2)
         screen.blit(txt, input_box)
         pygame.draw.rect(screen, (0, 0, 0), input_box, 1)
@@ -227,7 +229,7 @@ def main():
         for c in cactus_list:
             c.draw(screen)
             if player.rect.colliderect(c.rect):
-                finish_game(screen, game_score, text)
+                finish_game(screen, game_score, name)
                 run = False
                 break
             kill_cactus = c.update()
