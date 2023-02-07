@@ -186,7 +186,7 @@ def main():
         screen.blit(start_image, (0, 0))
         font = pygame.font.SysFont('arial', 30)
         txt = font.render(name, True, (0, 0, 0))
-        input_box.center = (width // 2, height // 2)
+        input_box.center = (width // 2, height // 2 - 250)
         screen.blit(txt, input_box)
         pygame.draw.rect(screen, (0, 0, 0), input_box, 1)
         pygame.display.flip()
